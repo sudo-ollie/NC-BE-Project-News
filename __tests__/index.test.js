@@ -65,3 +65,22 @@ describe('Base API', () => {
           })
         })
 });
+
+describe('Articles API', () => {
+  test('GET request should return a 200 and an object', () => {
+      return request(app)
+        .get('/api/articles/1')
+        .expect(200)
+        .then((response) => {
+          expect(typeof response.body).toBe('object')
+        })
+  })
+  test("Should return an error if article_id is an invalid input", () => {       
+      return request(app)
+        .get('/api/articles/test')
+        .expect(404)
+        .then((response) => {
+          expect(response.body.msg).toEqual('404 - File Not Found (Invalid Input Type)')
+        })
+  })
+});
