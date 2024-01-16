@@ -11,6 +11,79 @@
   },
   "GET /api/articles": {
     "description": "serves an array of all articles",
+    "queries": [],
+    "exampleResponse": {
+      "articles": ["Article1" , "Article2" , "Article3" , "Article4"]
+    }
+  },
+  "GET /api/users": {
+    "description": "serves an array of all users",
+    "queries": [],
+    "exampleResponse": {
+      "users": ["User1" , "User2" , "User3" , "User4"]
+    }
+  },
+  "GET /api/articles/:article_id": {
+    "description": "serves the article corresponding to the provided article_id",
+    "queries": [],
+    "exampleResponse": {
+      "articles": [
+        {
+          "title": "The Impact of Plastic on Jellyfish",
+          "topic": "Wildlife",
+          "author": "JelluFishMan",
+          "body": "Plastic isnt ideal...",
+          "created_at": "2018-05-30T15:59:13.341Z",
+          "votes": 0,
+          "comment_count": 6
+        }
+      ]
+    }
+  },
+  "GET /api/articles/:article_id/comments": {
+    "description": "serves an array containing the comments corresponding to the provided article_id",
+    "queries": [],
+    "exampleResponse": {
+      "comments": ["Comment 1" , "Comment 2" , "Comment 3" , "Comment 4" , "Comment 5"]
+    }
+  },
+  "GET /api/comments/:comment_id": {
+    "description": "deletes the comment corresponding to the given comment_id",
+    "queries": [],
+    "exampleResponse": {
+      "comments": {"status" : "Deleted" , "content" : "Comment content here"}
+    }
+  },
+  "POST /api/articles/:article_id/comments": {
+    "description": "adds a comment corresponding to the given article_id",
+    "queries": [],
+    "examplePayload": 
+      {"content" : "Desired comment here"},
+    "exampleResponse": {
+      "comments": {"status" : "Added" , "content" : "Desired comment here"}
+    }
+  },
+  "PATCH /api/articles/:article_id": {
+    "description": "edits an article corresponding to the given article_id",
+    "queries": [],
+    "examplePayload": 
+      {"targetSection" : "title" , "content" : "The Impact of Plastic on Jellyfish"},
+    "exampleResponse": {
+      "articles": [
+        {
+          "title": "The Impact of Plastic on Jellyfish",
+          "topic": "Wildlife",
+          "author": "JelluFishMan",
+          "body": "Plastic isnt ideal...",
+          "created_at": "2018-05-30T15:59:13.341Z",
+          "votes": 0,
+          "comment_count": 6
+        }
+      ]
+    }
+  },
+  "GET /api/articles/QUERY": {
+    "description": "serves an array of all articles",
     "queries": ["author", "topic", "sort_by", "order"],
     "exampleResponse": {
       "articles": [
