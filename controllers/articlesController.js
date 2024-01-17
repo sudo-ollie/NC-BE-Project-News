@@ -1,5 +1,6 @@
 const {
-    fetchArticle
+    fetchArticle,
+    pullAllArticles
 } = require('../models/articlesModels')
 
 exports.articleLookup = (req , res , next) => {
@@ -9,5 +10,12 @@ exports.articleLookup = (req , res , next) => {
             res.status(200).send({ article: article })
       })
       .catch(next)
-      
+}
+
+exports.allArticles = (req , res , next) => {
+    pullAllArticles()
+    .then((articles) => {
+        res.status(200).send({articles : articles})
+    })
+    .catch(next)
 }

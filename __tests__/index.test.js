@@ -66,7 +66,7 @@ describe('Base API', () => {
         })
 });
 
-describe('Articles API', () => {
+describe('Articles API - articles_id', () => {
   test('GET request should return a 200 and an object', () => {
       return request(app)
         .get('/api/articles/1')
@@ -80,7 +80,7 @@ describe('Articles API', () => {
         .get('/api/articles/test')
         .expect(404)
         .then((response) => {
-          expect(response.body.msg).toEqual('404 - File Not Found (Invalid Input Type)')
+          expect(response.body.msg).toEqual('400 - File Not Found (Invalid Input Type)')
         })
   })
   test("Should return an error if article_id is valid input but the file doesn't exist", () => {       
@@ -90,6 +90,38 @@ describe('Articles API', () => {
       .then((response) => {
         console.log(response.body.msg)
         expect(response.body.msg).toEqual('404 - File Not Found')
+      })
+})
+});
+
+describe('Articles API - articles', () => {
+  test('GET request should return a 200 and an object', () => {
+      return request(app)
+        .get('/api/articles')
+        .expect(200)
+        .then((response) => {
+          expect(typeof response.body.articles).toBe('object')
+          console.log(response.body.articles)
+        })
+  })
+  test('Response object should be properly sorted', () => {
+    return request(app)
+      .get('/api/articles')
+      .expect(200)
+      .then((response) => {
+        expect(response.body.articles).toBeSortedBy( 'created_at' , {descending : true})
+      })
+})
+  test.only("Object entries shouldn't contain a body property but should contain a comment count", () => {       
+    return request(app)
+      .get('/api/articles')
+      .expect(200)
+      .then((response) => {
+        response.body.articles.forEach((element) => {
+          console.log(Object.keys(element))
+          expect(Object.keys(element)).toEqual(["article_id", "title", "topic", "author", "created_at", "votes", "article_img_url" , "comment_count"])
+          //TODO - GROUPED SQL SEARCH - JOIN? COUNT?
+        })
       })
 })
 });

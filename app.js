@@ -11,7 +11,8 @@ const {
 } = require('./controllers/baseController')
 
 const {
-    articleLookup
+    articleLookup,
+    allArticles
 } = require('./controllers/articlesController')
 
 //Topics Endpoints
@@ -22,6 +23,7 @@ app.get('/api' , getEndpoints)
 
 //Article Endpoints
 app.get('/api/articles/*' , articleLookup )
+app.get('/api/articles' , allArticles)
 
 //Uncaught 404s
 app.all('*' , (req , res) => {
@@ -32,7 +34,7 @@ app.use((err , req , res , next) => {
     console.log(err , 'Err')
     if(err.code === '22P02'){
         res.status(404).send({
-            msg : '404 - File Not Found (Invalid Input Type)',
+            msg : '400 - File Not Found (Invalid Input Type)',
             error : err.error
         })
     }
