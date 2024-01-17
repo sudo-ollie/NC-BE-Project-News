@@ -12,7 +12,8 @@ const {
 
 const {
     articleLookup,
-    allArticles
+    allArticles,
+    getComments
 } = require('./controllers/articlesController')
 
 //Topics Endpoints
@@ -22,8 +23,11 @@ app.get('/api/topics' , getTopics)
 app.get('/api' , getEndpoints)
 
 //Article Endpoints
-app.get('/api/articles/*' , articleLookup )
+app.get('/api/articles/:article_id/comments' , getComments)
 app.get('/api/articles' , allArticles)
+app.get('/api/articles/*' , articleLookup )
+
+
 
 //Uncaught 404s
 app.all('*' , (req , res) => {
@@ -31,7 +35,7 @@ app.all('*' , (req , res) => {
 })
 
 app.use((err , req , res , next) => {
-    console.log(err , 'Err')
+    console.log(err)
     if(err.code === '22P02'){
         res.status(404).send({
             msg : '400 - File Not Found (Invalid Input Type)',
@@ -41,6 +45,11 @@ app.use((err , req , res , next) => {
     else if (err.msg === 'Article Not Found'){
         res.status(404).send({
             msg : '404 - File Not Found'
+        })
+    }
+    else if (err.msg === "Article Doesn't Exist"){
+        res.status(400).send({
+            msg : "Article Doesn't Exist"
         })
     }
 })

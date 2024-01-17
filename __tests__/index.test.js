@@ -112,7 +112,7 @@ describe('Articles API - articles', () => {
         expect(response.body.articles).toBeSortedBy( 'created_at' , {descending : true})
       })
 })
-  test.only("Object entries shouldn't contain a body property but should contain a comment count", () => {       
+  test("Object entries shouldn't contain a body property but should contain a comment count", () => {       
     return request(app)
       .get('/api/articles')
       .expect(200)
@@ -124,4 +124,45 @@ describe('Articles API - articles', () => {
         })
       })
 })
+});
+
+describe.only('Articles API - Get Article Comments', () => {
+  test('GET request should return a 200 and an array', () => {
+      return request(app)
+        .get('/api/articles/1/comments')
+        .expect(200)
+        .then((response) => {
+          expect(Array.isArray(response.body.comments)).toBe(true)
+        })
+  })
+
+  test("Array entries should contain all the correct properties && should be properly sorted", () => {       
+    return request(app)
+      .get('/api/articles/1/comments')
+      .expect(200)
+      .then((response) => {
+        response.body.comments.forEach((element) => {
+          expect(Object.keys(element)).toEqual([ 'comment_id', 'body', 'article_id', 'author', 'votes', 'created_at' ])
+          expect(response.body.comments).toBeSortedBy( 'created_at' , {descending : true})
+        })
+      })
+  })
+
+  test('Articles with no comments should return an empty array', () => {
+    return request(app)
+      .get('/api/articles/4/comments')
+      .expect(200)
+      .then((response) => {
+        expect(response.body.comments.length).toBe(0)
+      })
+  })
+  
+  test.only('Non-existent articles should respond with a 400 & message', () => {
+    return request(app)
+      .get('/api/articles/4000/comments')
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toEqual("Article Doesn't Exist")
+      })
+  })
 });

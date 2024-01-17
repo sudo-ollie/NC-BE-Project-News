@@ -29,3 +29,22 @@ exports.pullAllArticles = () => {
     })
 }
 
+exports.pullComments = (article_id) => {
+    return db.query('SELECT * FROM comments WHERE article_id= $1 ORDER BY created_at DESC' , [article_id])
+    .then((comments) => {
+        return comments.rows
+    })
+}
+
+
+exports.checkArticle = (article_id) => {
+    return db.query('SELECT * FROM articles WHERE article_id= $1' , [article_id])
+    .then((exists) => {
+        if(exists.rowCount === 0){
+            return Promise.reject({
+                status : 400 , 
+                msg : "Article Doesn't Exist"
+            })
+        }
+    })
+}
