@@ -83,4 +83,13 @@ describe('Articles API', () => {
           expect(response.body.msg).toEqual('404 - File Not Found (Invalid Input Type)')
         })
   })
+  test("Should return an error if article_id is valid input but the file doesn't exist", () => {       
+    return request(app)
+      .get('/api/articles/5000')
+      .expect(404)
+      .then((response) => {
+        console.log(response.body.msg)
+        expect(response.body.msg).toEqual('404 - File Not Found')
+      })
+})
 });

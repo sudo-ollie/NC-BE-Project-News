@@ -29,10 +29,16 @@ app.all('*' , (req , res) => {
 })
 
 app.use((err , req , res , next) => {
+    console.log(err , 'Err')
     if(err.code === '22P02'){
         res.status(404).send({
             msg : '404 - File Not Found (Invalid Input Type)',
             error : err.error
+        })
+    }
+    else if (err.msg === 'Article Not Found'){
+        res.status(404).send({
+            msg : '404 - File Not Found'
         })
     }
 })
