@@ -112,7 +112,7 @@ describe('Articles API - articles', () => {
         expect(response.body.articles).toBeSortedBy( 'created_at' , {descending : true})
       })
 })
-  test.only("Object entries shouldn't contain a body property but should contain a comment count", () => {       
+  test("Object entries shouldn't contain a body property but should contain a comment count", () => {       
     return request(app)
       .get('/api/articles')
       .expect(200)
