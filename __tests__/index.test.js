@@ -126,7 +126,7 @@ describe('Articles API - articles', () => {
 })
 });
 
-describe.only('Articles API - Get Article Comments', () => {
+describe('Articles API - Get Article Comments', () => {
   test('GET request should return a 200 and an array', () => {
       return request(app)
         .get('/api/articles/1/comments')
@@ -157,7 +157,7 @@ describe.only('Articles API - Get Article Comments', () => {
       })
   })
   
-  test.only('Non-existent articles should respond with a 400 & message', () => {
+  test('Non-existent articles should respond with a 400 & message', () => {
     return request(app)
       .get('/api/articles/4000/comments')
       .expect(400)
