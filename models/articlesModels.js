@@ -13,9 +13,13 @@ exports.fetchArticle = (article_id) => {
 }
 
 exports.pullAllArticles = () => {
-    return db.query('SELECT * FROM articles ORDER BY created_at DESC')
+    return db.query(`
+    SELECT articles.*, 
+    (SELECT COUNT(*) FROM comments WHERE comments.article_id = articles.article_id) AS comment_count
+    FROM articles 
+    ORDER BY created_at DESC`)
     .then((articles) => {
-        formattedArr = articles.rows.map(({article_id , title , topic , author , created_at , votes , article_img_url}) => ({
+        formattedArr = articles.rows.map(({article_id , title , topic , author , created_at , votes , article_img_url , comment_count}) => ({
             article_id: article_id,
             title: title,
             topic: topic,
@@ -46,5 +50,13 @@ exports.checkArticle = (article_id) => {
                 msg : "Article Doesn't Exist"
             })
         }
+    })
+}
+
+exports.createComment = (article_id , username , body) => {
+    return db.query('INSERT INTO comments (article_id , author , body) VALUES ($1 , $2 , $3) RETURNING *' , [article_id , username , body])
+    .then((result) => {
+        console.log(result , 'ERROR')
+        return result.rows[0]
     })
 }
