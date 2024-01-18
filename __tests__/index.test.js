@@ -234,7 +234,7 @@ describe('Articles API - POST Comment', () => {
 
 describe('Articles API - PATCH Vote Count', () => {
 
-  test.only('PATCH request should return a 200 and the payload in response', () => {
+  test('PATCH request should return a 200 and the payload in response', () => {
     const votePayload = { inc_votes: 10 }
     const originalVote = commentFile[0].votes
 
