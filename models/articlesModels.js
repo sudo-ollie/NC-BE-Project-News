@@ -56,7 +56,24 @@ exports.checkArticle = (article_id) => {
 exports.createComment = (article_id , username , body) => {
     return db.query('INSERT INTO comments (article_id , author , body) VALUES ($1 , $2 , $3) RETURNING *' , [article_id , username , body])
     .then((result) => {
-        console.log(result , 'ERROR')
+        return result.rows[0]
+    })
+}
+
+exports.editVotes = (article_id , inc_votes) => {
+    return db.query('SELECT votes FROM articles WHERE article_id= $1' , [article_id])
+    .then((voteCount) => {
+        if(voteCount.rowCount === 0){
+            return Promise.reject({
+                status : 404 , 
+                msg : "Article Doesn't Exist / Error Reading Votes"
+            })}
+            return Number(voteCount.rows[0].votes) + Number(inc_votes)
+    })
+    .then((newVote) => {
+        return db.query('UPDATE articles SET votes= $1 WHERE article_id= $2 RETURNING *' , [newVote , article_id])
+    })
+    .then((result) => {
         return result.rows[0]
     })
 }

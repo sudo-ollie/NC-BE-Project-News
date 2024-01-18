@@ -3,7 +3,8 @@ const {
     pullAllArticles,
     pullComments,
     checkArticle,
-    createComment
+    createComment,
+    editVotes
 } = require('../models/articlesModels')
 
 exports.articleLookup = (req , res , next) => {
@@ -44,8 +45,12 @@ exports.addComment = (req , res , next) => {
     .catch(next)
 }
 
-exports.updateArticle = (req , res , next) => {
+exports.updateVotes = (req , res , next) => {
     const {article_id} = req.params
     const {inc_votes} = req.body
-    console.log(article_id , inc_votes)
+    Promise.all([editVotes(article_id , inc_votes) , checkArticle(article_id)])
+    .then((response) => {
+        res.status(200).send({updated_article : response[0]})
+    })
+    .catch(next)
 }

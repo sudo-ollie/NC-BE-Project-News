@@ -15,7 +15,7 @@ const {
     allArticles,
     getComments,
     addComment,
-    updateArticle
+    updateVotes
 } = require('./controllers/articlesController')
 
 //Parses incoming JSON & adds to req.body
@@ -28,7 +28,7 @@ app.get('/api/topics' , getTopics)
 app.get('/api' , getEndpoints)
 
 //Article Endpoints
-app.patch('/api/articles/:article_id' , updateArticle)
+app.patch('/api/articles/:article_id' , updateVotes)
 app.get('/api/articles/:article_id/comments' , getComments)
 app.post('/api/articles/:article_id/comments' , addComment)
 app.get('/api/articles' , allArticles)
@@ -43,8 +43,21 @@ app.all('*' , (req , res) => {
     res.status(404).send({msg : 'No Such Endpoint'})
 })
 
+//Middleware
+
+const invalidErrorRegex = /("NaN")/
+
 app.use((err , req , res , next) => {
-    console.log('ERROR' , err)
+    console.error(err)
+    if(err.code === '22P02' && invalidErrorRegex.test(err) === true){
+        res.status(400).send({
+            msg : '400 - Invalid Data Provided',
+            error : err.error
+        })
+    }
+    else {
+        next(err)
+    }
     if(err.code === '22P02'){
         res.status(404).send({
             msg : '400 - File Not Found (Invalid Input Type)',
@@ -75,6 +88,14 @@ app.use((err , req , res , next) => {
     if (err.msg === 'Article Not Found'){
         res.status(404).send({
             msg : '404 - File Not Found'
+        })
+    }
+    else {
+        next(err)
+    }
+    if (err.msg === "Article Doesn't Exist / Error Reading Votes"){
+        res.status(404).send({
+            msg : "Article Doesn't Exist / Error Reading Votes"
         })
     }
     else {
