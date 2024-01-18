@@ -164,7 +164,7 @@ describe('Articles API - Get Article Comments', () => {
   })
 });
 
-describe.only('Articles API - POST Comment', () => {
+describe('Articles API - POST Comment', () => {
 
   test('POST request should return a 200 and the payload in response', () => {
     const commentPayload = {
@@ -214,7 +214,7 @@ describe.only('Articles API - POST Comment', () => {
       })
   }) 
 
-  test.only("Valid post request to an article that doesn't exist should return a 404 & message", () => {
+  test("Valid post request to an article that doesn't exist should return a 404 & message", () => {
     const commentPayload = {
       username : 'icellusedkars',
       body : 'Jest is the best!'
