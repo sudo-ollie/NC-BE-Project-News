@@ -28,10 +28,8 @@ exports.addComment = (req , res , next) => {
 
 exports.deleteComment = (req , res , next) => {
     const {comment_id} = req.params
-    console.log(comment_id)
     removeComment(comment_id)
     .then((response) => {
-        console.log(response , 'Test')
         response === undefined
         ? res.status(404).send({
             msg : "404 - COMMENT DOESN'T EXIST"

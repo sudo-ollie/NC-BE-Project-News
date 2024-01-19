@@ -52,8 +52,7 @@ const invalidIntRegex = /error: invalid input syntax for type integer:/
 
 app.use((err , req , res , next) => {
     console.error(err)
-    console.log(invalidIntRegex.test(err))
-    if(err.code === '22P02' && invalidNaNRegex.test(err) === true){
+    if(err.msg === '22P02' && invalidNaNRegex.test(err) === true){
         res.status(400).send({
             msg : '400 - Invalid Data Provided',
             error : err.error
@@ -62,6 +61,11 @@ app.use((err , req , res , next) => {
     else if(err.code === '22P02' && invalidIntRegex.test(err) === true){
         res.status(400).send({
             msg : "400 - INVALID COMMENT ID (NON-INT)"
+        })
+    }
+    else if(err.msg === "Comment Doesn't Exist"){
+        res.status(404).send({
+            msg : "404 - COMMENT DOESN'T EXIST"
         })
     }
     else if(err.code === '22P02'){

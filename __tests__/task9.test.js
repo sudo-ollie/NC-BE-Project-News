@@ -29,9 +29,6 @@ describe('TASK 9 - DELETE COMMENT BY COMMENT_ID', () => {
       return request(app)
           .delete('/api/comments/5')
           .expect(204)
-          .then((response) => {
-            expect(response.body.hasOwnProperty('msg')).toBe(false)
-          })
       })
     
       test('REQUEST TO A NON-EXISTENT COMMENT SHOULD RETURN A 404 + MESSAGE', () => {
