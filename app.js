@@ -13,10 +13,14 @@ const {
 const {
     articleLookup,
     allArticles,
-    getComments,
-    addComment,
     updateVotes
 } = require('./controllers/articlesController')
+
+const {
+    getComments,
+    addComment,
+    deleteComment
+} = require('./controllers/commentsController')
 
 //Parses incoming JSON & adds to req.body
 app.use(express.json())
@@ -34,9 +38,8 @@ app.post('/api/articles/:article_id/comments' , addComment)
 app.get('/api/articles' , allArticles)
 app.get('/api/articles/*' , articleLookup )
 
-
-
-
+//Comments Endpoints
+app.delete('/api/comments/:comment_id' , deleteComment)
 
 //Uncaught 404s
 app.all('*' , (req , res) => {
@@ -44,89 +47,65 @@ app.all('*' , (req , res) => {
 })
 
 //Middleware
-
-const invalidErrorRegex = /("NaN")/
+const invalidNaNRegex = /("NaN")/
+const invalidIntRegex = /error: invalid input syntax for type integer:/
 
 app.use((err , req , res , next) => {
     console.error(err)
-    if(err.code === '22P02' && invalidErrorRegex.test(err) === true){
+    console.log(invalidIntRegex.test(err))
+    if(err.code === '22P02' && invalidNaNRegex.test(err) === true){
         res.status(400).send({
             msg : '400 - Invalid Data Provided',
             error : err.error
         })
     }
-    else {
-        next(err)
+    else if(err.code === '22P02' && invalidIntRegex.test(err) === true){
+        res.status(400).send({
+            msg : "400 - INVALID COMMENT ID (NON-INT)"
+        })
     }
-    if(err.code === '22P02'){
+    else if(err.code === '22P02'){
         res.status(404).send({
             msg : '400 - File Not Found (Invalid Input Type)',
             error : err.error
         })
     }
-    else {
-        next(err)
-    }
-    if(err.code === '23502'){
+    else if(err.code === '23502'){
         res.status(404).send({
             msg : '404 - Missing Required Data',
             error : err.error
         })
     }
-    else {
-        next(err)
-    }
-    if(err.code === '23503'){
+    else if(err.code === '23503'){
         res.status(404).send({
             msg : "404 - Article / User Doesn't Exist",
             error : err.error
         })
     }
-    else {
-        next(err)
-    }
-    if (err.msg === 'Article Not Found'){
+    else if (err.msg === 'Article Not Found'){
         res.status(404).send({
             msg : '404 - File Not Found'
         })
     }
-    else {
-        next(err)
-    }
-    if (err.msg === "Article Doesn't Exist / Error Reading Votes"){
+    else if (err.msg === "Article Doesn't Exist / Error Reading Votes"){
         res.status(404).send({
             msg : "Article Doesn't Exist / Error Reading Votes"
         })
     }
-    else {
-        next(err)
-    }
-    if (err.msg === "Article Doesn't Exist"){
+    else if (err.msg === "Article Doesn't Exist"){
         res.status(400).send({
             msg : "Article Doesn't Exist"
         })
     }
-    else {
-        next(err)
-    }
-    if (err.msg === 'Missing Headers'){
+    else if (err.msg === 'Missing Headers'){
         res.status(404).send({
             msg : "Required Headers Missing"
         })
     }
-    else {
-        next(err)
-    }
-    if (err.code === '500'){
-        console.log(`
-        Error Code : ${err.code} , 
-        Error Message : ${err.msg} ,
-
-        Error Full : ${err}
-        `)
+    else if (err.code === '500'){
+        console.error(err)
     }
 })
-
 
 
 module.exports = app
