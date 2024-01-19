@@ -22,6 +22,10 @@ const {
     deleteComment
 } = require('./controllers/commentsController')
 
+const {
+    getUsers
+} = require('./controllers/userController')
+
 //Parses incoming JSON & adds to req.body
 app.use(express.json())
 
@@ -40,6 +44,9 @@ app.get('/api/articles/*' , articleLookup )
 
 //Comments Endpoints
 app.delete('/api/comments/:comment_id' , deleteComment)
+
+//User Endpoints
+app.get('/api/users' , getUsers)
 
 //Uncaught 404s
 app.all('*' , (req , res) => {
