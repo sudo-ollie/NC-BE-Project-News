@@ -12,25 +12,38 @@ exports.fetchArticle = (article_id) => {
     })
 }
 
-exports.pullAllArticles = () => {
-    return db.query(`
-    SELECT articles.*, 
-    (SELECT COUNT(*) FROM comments WHERE comments.article_id = articles.article_id) AS comment_count
-    FROM articles 
-    ORDER BY created_at DESC`)
-    .then((articles) => {
-        formattedArr = articles.rows.map(({article_id , title , topic , author , created_at , votes , article_img_url , comment_count}) => ({
-            article_id: article_id,
-            title: title,
-            topic: topic,
-            author: author,
-            created_at: created_at,
-            votes: votes,
-            article_img_url: article_img_url,
-            comment_count : comment_count
-        }))
-        return formattedArr
-    })
+exports.pullAllArticles = (param) => {
+    const validSorts = ['title' , 'topic' , 'author' , 'body' , 'votes' , 'created_at']
+    if(validSorts.includes(param)){
+        let query = (`SELECT articles.${param} FROM articles`)
+        return db.query(query)
+        .then((result) => {
+            return result.rows
+        })
+    }
+    else if (!param) {
+        return db.query(`
+        SELECT articles.*, 
+        (SELECT COUNT(*) FROM comments 
+        WHERE comments.article_id = articles.article_id) AS comment_count
+        FROM articles 
+        ORDER BY created_at DESC`)
+        .then((articles) => {
+            formattedArr = articles.rows.map(({article_id , title , topic , author , created_at , votes , article_img_url , comment_count}) => ({
+                article_id: article_id,
+                title: title,
+                topic: topic,
+                author: author,
+                created_at: created_at,
+                votes: votes,
+                article_img_url: article_img_url,
+                comment_count : comment_count
+            }))
+            return formattedArr
+    })}
+    else {
+        return new Error({status : 400 , msg : 'Non-Valid Query'})
+    }
 }
 
 exports.pullComments = (article_id) => {
