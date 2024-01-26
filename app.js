@@ -19,8 +19,13 @@ const {
 const {
     getComments,
     addComment,
-    deleteComment
+    deleteComment,
+    getCommentCount
 } = require('./controllers/commentsController')
+
+const {
+    getUsers
+} = require('./controllers/userController')
 
 //Parses incoming JSON & adds to req.body
 app.use(express.json())
@@ -33,6 +38,7 @@ app.get('/api' , getEndpoints)
 
 //Article Endpoints
 app.patch('/api/articles/:article_id' , updateVotes)
+app.get('/api/articles/:article_id' , getCommentCount)
 app.get('/api/articles/:article_id/comments' , getComments)
 app.post('/api/articles/:article_id/comments' , addComment)
 app.get('/api/articles' , allArticles)
@@ -40,6 +46,9 @@ app.get('/api/articles/*' , articleLookup )
 
 //Comments Endpoints
 app.delete('/api/comments/:comment_id' , deleteComment)
+
+//User Endpoints
+app.get('/api/users' , getUsers)
 
 //Uncaught 404s
 app.all('*' , (req , res) => {
@@ -49,9 +58,10 @@ app.all('*' , (req , res) => {
 //Middleware
 const invalidNaNRegex = /("NaN")/
 const invalidIntRegex = /error: invalid input syntax for type integer:/
+const invalidTypeErrorRegex = /TypeError/
 
 app.use((err , req , res , next) => {
-    console.error(err)
+    console.error('ERROR : ' , err)
     if(err.msg === '22P02' && invalidNaNRegex.test(err) === true){
         res.status(400).send({
             msg : '400 - Invalid Data Provided',
@@ -61,6 +71,15 @@ app.use((err , req , res , next) => {
     else if(err.code === '22P02' && invalidIntRegex.test(err) === true){
         res.status(400).send({
             msg : "400 - INVALID COMMENT ID (NON-INT)"
+        })
+    }
+    else if(err.msg === 'Non-Valid Query'){
+        res.status(400).send({
+            msg : 'Non-Valid Query'})
+    }
+    else if(invalidTypeErrorRegex.test(err) === true){
+        res.status(400).send({
+            msg : "Non-Valid Query"
         })
     }
     else if(err.msg === "Comment Doesn't Exist"){

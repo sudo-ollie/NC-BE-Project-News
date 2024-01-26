@@ -17,7 +17,8 @@ exports.articleLookup = (req , res , next) => {
 }
 
 exports.allArticles = (req , res , next) => {
-    pullAllArticles()
+    const {topic} = req.query
+    pullAllArticles(topic)
     .then((articles) => {
         res.status(200).send({articles : articles})
     })

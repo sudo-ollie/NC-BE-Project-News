@@ -38,3 +38,16 @@ exports.removeComment = (comment_id) => {
         return result.rows[0]
     })
 }
+
+exports.fetchCommentCount = (article_id) => {
+    console.log(article_id)
+    return db.query(
+    `SELECT articles.title , (SELECT COUNT(*) FROM comments WHERE comments.$1 = articles.$1 ) AS comment_count` , [article_id])
+    .then((result) => {
+        console.log(result)
+        //Edit whatever is passed back, can't work out why $1 wont work though. Believe its to do with them being identifiers but unsure how to fix this? NCAfterHours
+        return result.rows
+    })
+}
+
+//    FROM articles WHERE article_id= $1

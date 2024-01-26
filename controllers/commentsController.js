@@ -2,7 +2,8 @@ const {
     pullComments,
     createComment,
     checkArticle,
-    removeComment
+    removeComment,
+    fetchCommentCount
 } = require('../models/commentsModels')
 
 exports.getComments = (req , res , next) => {
@@ -37,4 +38,15 @@ exports.deleteComment = (req , res , next) => {
         : res.status(204).end()
     })
     .catch(next)
+}
+
+exports.getCommentCount = (req , res , next) => {
+    const {article_id} = req.params
+    const {comment_count} = req.query
+    comment_count === undefined
+    ? next({status : 400 , msg : 'Non-Valid Query'})
+    : fetchCommentCount(article_id)
+    .then((result) => {
+        console.log(result)
+    })
 }
