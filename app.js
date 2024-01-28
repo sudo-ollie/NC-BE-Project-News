@@ -61,7 +61,7 @@ const invalidIntRegex = /error: invalid input syntax for type integer:/
 const invalidTypeErrorRegex = /TypeError/
 
 app.use((err , req , res , next) => {
-    console.error('ERROR : ' , err)
+    console.error('ERROR : ' , err.code)
     if(err.msg === '22P02' && invalidNaNRegex.test(err) === true){
         res.status(400).send({
             msg : '400 - Invalid Data Provided',

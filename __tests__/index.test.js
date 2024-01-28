@@ -12,7 +12,7 @@ afterAll(() => {
   db.end()
 })
 
-describe('General Tests', () => {
+describe('GENERAL API TESTS', () => {
     test('Requests to an incorrect endpoint should return 404 + a message', () => {
       return request(app)
         .get('/api/test')
@@ -23,8 +23,8 @@ describe('General Tests', () => {
     })
   });
 
-describe('Topics API', () => {
-    test('GET request should return an array of objects', () => {
+describe('TOPICS API', () => {
+    test('GET - REQUEST SHOULD RETURN AN ARRAY OF OBJECTS', () => {
         return request(app)
           .get('/api/topics')
           .expect(200)
@@ -38,7 +38,7 @@ describe('Topics API', () => {
           })
       })
     
-      test('Each array item should have the correct properties', () => {
+      test('EVERY ARRAY ITEM SHOULD CONTAIN THE CORRECT PROPERTIES', () => {
         return request(app)
           .get('/api/topics')
           .then((response) => {
@@ -89,7 +89,6 @@ describe('Articles API - Return article by article_id', () => {
       .get('/api/articles/5000')
       .expect(404)
       .then((response) => {
-        console.log(response.body.msg)
         expect(response.body.msg).toEqual('404 - File Not Found')
       })
 })
@@ -102,7 +101,6 @@ describe('Articles API - Returrn articles', () => {
         .expect(200)
         .then((response) => {
           expect(typeof response.body.articles).toBe('object')
-          console.log(response.body.articles)
         })
   })
   test('Response object should be properly sorted', () => {
@@ -137,9 +135,7 @@ describe('Articles API - Get Article Comments', () => {
     return request(app)
       .get('/api/articles/1/comments')
       .then((response) => {
-        console.log(response.body.comments , 'COMMENTS IN TEST')
         response.body.comments.forEach((element) => {
-          console.log(element , 'ELEMENTS')
           expect(Object.keys(element)).toEqual([ 'comment_id', 'body', 'article_id', 'author', 'votes', 'created_at' ])
           expect(response.body.comments).toBeSortedBy( 'created_at' , {descending : true})
         })
@@ -150,7 +146,6 @@ describe('Articles API - Get Article Comments', () => {
     return request(app)
       .get('/api/articles/2/comments')
       .then((response) => {
-        console.log(response.body.comments , 'COMMENTS')
         expect(response.body.comments.length).toBe(0)
       })
   })
@@ -194,7 +189,6 @@ describe('Articles API - POST Comment', () => {
       .send(commentPayload)
       .expect(404)
       .then((response) => {
-        console.log(response.body)
         expect(response.body.msg).toEqual('404 - Missing Required Data')
       })
   })
@@ -210,7 +204,6 @@ describe('Articles API - POST Comment', () => {
       .send(commentPayload)
       .expect(404)
       .then((response) => {
-        console.log(response.body)
         expect(response.body.msg).toEqual("404 - Article / User Doesn't Exist")
       })
   }) 
@@ -226,7 +219,6 @@ describe('Articles API - POST Comment', () => {
       .send(commentPayload)
       .expect(404)
       .then((response) => {
-        console.log(response.body)
         expect(response.body.msg).toEqual("404 - Article / User Doesn't Exist")
       })
 }) 
@@ -256,7 +248,7 @@ describe('Articles API - PATCH Vote Count', () => {
         .send(votePayload)
         .expect(400)
         .then((response) => {
-          expect(response.body.msg).toBe('400 - Invalid Data Provided')
+          expect(response.body.msg).toBe('400 - INVALID COMMENT ID (NON-INT)')
         })
   })
 
@@ -271,5 +263,98 @@ describe('Articles API - PATCH Vote Count', () => {
         .then((response) => {
           expect(response.body.msg).toBe("Article Doesn't Exist / Error Reading Votes")
         })
+  })
+});
+
+describe('TASK 9 - DELETE COMMENT BY COMMENT_ID', () => {
+
+  test('VALID REQUEST SHOULD RETURN A 204 ONLY (NO MESSAGE)', () => {
+    return request(app)
+        .delete('/api/comments/5')
+        .expect(204)
+    })
+  
+    test('REQUEST TO A NON-EXISTENT COMMENT SHOULD RETURN A 404 + MESSAGE', () => {
+      return request(app)
+        .delete('/api/comments/500')
+        .expect(404)
+        .then((response) => {
+          expect(response.body.msg).toEqual("404 - COMMENT DOESN'T EXIST")
+        })
+    })
+
+    test('REQUEST TO AN INVALID COMMENT_ID SHOULD RETURN A 400 + MESSAGE', () => {
+      return request(app)
+        .delete('/api/comments/one')
+        .expect(400)
+        .then((response) => {
+          expect(response.body.msg).toEqual("400 - INVALID COMMENT ID (NON-INT)")
+        })
+    })
+});
+
+describe('GET - /api/users', () => {
+
+  test('GET REQUEST SHOULD RETURN A 200 & ARRAY OF USER OBJECTS', () => {
+      return request(app)
+        .get('/api/users')
+        .expect(200)
+        .then((response) => {
+          expect(Array.isArray(response.body.users)).toBe(true)
+          expect(response.body.users.length).not.toEqual(0)
+          response.body.users.forEach((user) => {
+            expect(Array.isArray(user)).toBe(false)
+            expect(Object.keys(user)).toEqual(['username' , 'name' , 'avatar_url'])
+          })
+        })
+    })
+});
+
+describe('TASK DESCRIPTION HERE', () => {
+
+  test('GET request should return a 200 & query results', () => {
+      return request(app)
+        .get('/api/articles?topic=title')
+        .expect(200)
+        .then((response) => {
+          expect(response.body.articles.length).toEqual(13)
+        })
+    })
+
+  test('GET request with no query should return all results & a 200', () => {
+    return request(app)
+      .get('/api/articles')
+      .expect(200)
+      .then((response) => {
+      })
+  })
+
+  test('Non-valid query should return a 400 & message', () => {
+    return request(app)
+      .get('/api/articles?topic=invalid')
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toEqual('Non-Valid Query')
+      })
+  })
+});
+
+describe('TASK DESCRIPTION HERE', () => {
+
+  test('GET request should return a 200 & query results', () => {
+      return request(app)
+        .get('/api/articles/8?comment_count=true')
+        .expect(200)
+        .then((response) => {
+        })
+    })
+
+  test('Non-valid query should return a 400 & message', () => {
+    return request(app)
+      .get('/api/articles/8?invalid_count=true')
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toEqual('Non-Valid Query')
+      })
   })
 });
