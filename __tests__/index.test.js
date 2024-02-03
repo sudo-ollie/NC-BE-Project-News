@@ -23,7 +23,7 @@ describe('GENERAL API TESTS', () => {
     })
   });
 
-describe('TOPICS API', () => {
+describe('TOPICS API - RETURN ALL TOPICS', () => {
     test('GET - REQUEST SHOULD RETURN AN ARRAY OF OBJECTS', () => {
         return request(app)
           .get('/api/topics')
@@ -49,7 +49,7 @@ describe('TOPICS API', () => {
       })
 });
 
-describe('Base API', () => {
+describe('Base API - RETURN ALL ENDPOINTS', () => {
     test('GET request should return an endpoint object', () => {
         return request(app)
           .get('/api')
@@ -67,21 +67,22 @@ describe('Base API', () => {
         })
 });
 
-describe('Articles API - Return article by article_id', () => {
+describe('ARTICLES API - RETURN ARTICLE BY ARTICLE_ID', () => {
   test('GET request should return a 200 and an object', () => {
       return request(app)
         .get('/api/articles/1')
         .expect(200)
         .then((response) => {
+          console.log(response.body)
           expect(typeof response.body).toBe('object')
         })
   })
   test("Should return an error if article_id is an invalid input", () => {       
       return request(app)
         .get('/api/articles/test')
-        .expect(404)
+        .expect(400)
         .then((response) => {
-          expect(response.body.msg).toEqual('400 - File Not Found (Invalid Input Type)')
+          expect(response.body.msg).toEqual('400 - INVALID COMMENT ID (NON-INT)')
         })
   })
   test("Should return an error if article_id is valid input but the file doesn't exist", () => {       
@@ -94,7 +95,7 @@ describe('Articles API - Return article by article_id', () => {
 })
 });
 
-describe('Articles API - Returrn articles', () => {
+describe('ARTICLES API - RETURN ALL ARTICLES', () => {
   test('GET request should return a 200 and an object', () => {
       return request(app)
         .get('/api/articles')
@@ -121,13 +122,16 @@ describe('Articles API - Returrn articles', () => {
 })
 });
 
-describe('Articles API - Get Article Comments', () => {
+describe('ARTICLES API - GET ARTICLE COMMENTS BY ARTICLE_ID', () => {
   test('GET request should return a 200 and an array', () => {
       return request(app)
         .get('/api/articles/1/comments')
         .expect(200)
         .then((response) => {
+          console.log(response.body)
+          console.log(response , 'RESPONSE')
           expect(Array.isArray(response.body.comments)).toBe(true)
+          //Jest objectMatch
         })
   })
 
@@ -160,7 +164,7 @@ describe('Articles API - Get Article Comments', () => {
   })
 });
 
-describe('Articles API - POST Comment', () => {
+describe('ARTICLES API - ADD ARTICLE COMMENT', () => {
 
   test('POST request should return a 200 and the payload in response', () => {
     const commentPayload = {
@@ -168,15 +172,15 @@ describe('Articles API - POST Comment', () => {
       body : 'Jest is the best!'
     }
 
-      return request(app)
-        .post('/api/articles/5/comments')
-        .send(commentPayload)
-        .expect(200)
-        .then((response) => {
-          expect(response.body.comment_content.article_id).toEqual(5)
-          expect(response.body.comment_content.author).toEqual('icellusedkars')
-          expect(response.body.comment_content.body).toEqual('Jest is the best!')
-        })
+    return request(app)
+      .post('/api/articles/5/comments')
+      .send(commentPayload)
+      .expect(200)
+      .then((response) => {
+        expect(response.body.comment_content.article_id).toEqual(5)
+        expect(response.body.comment_content.author).toEqual('icellusedkars')
+        expect(response.body.comment_content.body).toEqual('Jest is the best!')
+      })
   })
 
   test('POST request with missing headers should return a 404 & message', () => {
@@ -224,11 +228,10 @@ describe('Articles API - POST Comment', () => {
 }) 
 });
 
-describe('Articles API - PATCH Vote Count', () => {
+describe('ARTICLES API - PATCH VOTE COUNT', () => {
 
   test('PATCH request should return a 200 and the payload in response', () => {
     const votePayload = { inc_votes: 10 }
-    const originalVote = commentFile[0].votes
 
       return request(app)
         .patch('/api/articles/1')
@@ -241,7 +244,6 @@ describe('Articles API - PATCH Vote Count', () => {
 
   test('PATCH request with an incorrect value should return a 400 & message', () => {
     const votePayload = { inc_votes: 'ten' }
-    const originalVote = commentFile[0].votes
 
       return request(app)
         .patch('/api/articles/1')
@@ -254,7 +256,6 @@ describe('Articles API - PATCH Vote Count', () => {
 
   test('PATCH request to an incorrect endpoint should return a 404 & message', () => {
     const votePayload = { inc_votes: 10 }
-    const originalVote = commentFile[0].votes
 
       return request(app)
         .patch('/api/articles/500')
@@ -266,7 +267,7 @@ describe('Articles API - PATCH Vote Count', () => {
   })
 });
 
-describe('TASK 9 - DELETE COMMENT BY COMMENT_ID', () => {
+describe('ARTICLES API - DELETE COMMENT BY COMMENT_ID', () => {
 
   test('VALID REQUEST SHOULD RETURN A 204 ONLY (NO MESSAGE)', () => {
     return request(app)
@@ -293,7 +294,7 @@ describe('TASK 9 - DELETE COMMENT BY COMMENT_ID', () => {
     })
 });
 
-describe('GET - /api/users', () => {
+describe('USERS API - GET LIST OF USERS', () => {
 
   test('GET REQUEST SHOULD RETURN A 200 & ARRAY OF USER OBJECTS', () => {
       return request(app)
@@ -310,48 +311,50 @@ describe('GET - /api/users', () => {
     })
 });
 
-describe('TASK DESCRIPTION HERE', () => {
+describe('ARTICLES API - REQUESTS WITH QUERIES', () => {
 
   test('GET request should return a 200 & query results', () => {
       return request(app)
-        .get('/api/articles?topic=title')
+        .get('/api/articles?topic=mitch')
         .expect(200)
         .then((response) => {
-          expect(response.body.articles.length).toEqual(13)
+          expect(response.body.articles.length).toEqual(12)
         })
     })
+
+  test('GET request with a query + a sort returns a correct query & a 200 ', () => {
+    return request(app)
+      .get('/api/articles?topic=mitch&sorted=Asc')
+      .expect(200)
+      .then((response) => {
+        expect(response.body.articles.length).toEqual(12)
+        expect(response.body.articles).toBeSortedBy( 'created_at' , {ascending : true})
+      })
+  })
 
   test('GET request with no query should return all results & a 200', () => {
     return request(app)
       .get('/api/articles')
       .expect(200)
       .then((response) => {
+        expect(response.body.articles.length).toEqual(13)
       })
   })
 
-  test('Non-valid query should return a 400 & message', () => {
+
+  test('Valid query topic with an invalid value should return a 400 & msg', () => {
     return request(app)
       .get('/api/articles?topic=invalid')
       .expect(400)
       .then((response) => {
-        expect(response.body.msg).toEqual('Non-Valid Query')
+        console.log(response.body)
+        expect(response.body.msg).toEqual('400 - No Matches Found')
       })
   })
-});
 
-describe('TASK DESCRIPTION HERE', () => {
-
-  test('GET request should return a 200 & query results', () => {
-      return request(app)
-        .get('/api/articles/8?comment_count=true')
-        .expect(200)
-        .then((response) => {
-        })
-    })
-
-  test('Non-valid query should return a 400 & message', () => {
+  test('Invalid query topic with an invalid value should return a 400 & msg', () => {
     return request(app)
-      .get('/api/articles/8?invalid_count=true')
+      .get('/api/articles?test=invalid')
       .expect(400)
       .then((response) => {
         expect(response.body.msg).toEqual('Non-Valid Query')

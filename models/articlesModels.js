@@ -1,6 +1,6 @@
 const db = require('../db/connection')
 
-exports.fetchArticle = (article_id) => {
+exports.fetchByID = (article_id) => {
     return db.query('SELECT * FROM articles WHERE article_id= $1' , [article_id])
     .then((response) => {
         if (response.rows.length === 0){
@@ -8,20 +8,40 @@ exports.fetchArticle = (article_id) => {
                 status : 404 , 
                 msg : 'Article Not Found'})
         }
-        return response.rows
+        return response.rows[0]
     })
 }
 
-exports.pullAllArticles = (param) => {
+exports.fetchAllArticles = (queryObj) => {
     const validSorts = ['title' , 'topic' , 'author' , 'body' , 'votes' , 'created_at']
-    if(validSorts.includes(param)){
-        let query = (`SELECT articles.${param} FROM articles`)
+    
+    if(validSorts.includes(Object.keys(queryObj)[0]) && Object.keys(queryObj[1] === 'sorted')){
+        queryObj[Object.keys(queryObj)[1]] === 'Asc'
+        ? query = (`SELECT articles.* FROM articles WHERE ${Object.keys(queryObj)[0]}='${queryObj[Object.keys(queryObj)[0]]}' ORDER BY created_at ${queryObj[Object.keys(queryObj)[1]].toUpperCase()}`)
+        : query = (`SELECT articles.* FROM articles WHERE ${Object.keys(queryObj)[0]}='${queryObj[Object.keys(queryObj)[0]]}' ORDER BY created_at DESC`)
         return db.query(query)
         .then((result) => {
-            return result.rows
-        })
-    }
-    else if (!param) {
+            if (result.rows.length === 0) {
+                return Promise.reject({status : 400 , msg : 'No Matches'})
+            } 
+            else {
+                return result.rows
+            }
+        })}
+
+else if (validSorts.includes(Object.keys(queryObj)[0])) {
+    let query = `SELECT articles.* FROM articles WHERE ${Object.keys(queryObj)[0]}='${queryObj[Object.keys(queryObj)[0]]}'`;
+    return db.query(query)
+        .then((result) => {
+            if (result.rows.length === 0) {
+                return Promise.reject({status : 400 , msg : 'No Matches'})
+            } 
+            else {
+                return result.rows
+            }
+        })}
+
+    else if (Object.keys(queryObj).length === 0) {
         return db.query(`
         SELECT articles.*, 
         (SELECT COUNT(*) FROM comments 

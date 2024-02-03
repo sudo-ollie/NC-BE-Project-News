@@ -1,11 +1,11 @@
 const {
-    fetchUsers
+    fetchAllUsers
 } = require('../models/userModels')
 
 
 
-exports.getUsers = (req , res , next) => {
-    fetchUsers()
+exports.returnAllUsers = (req , res , next) => {
+    fetchAllUsers()
     .then((users) => {
         res.status(200).send({users : users})
     })

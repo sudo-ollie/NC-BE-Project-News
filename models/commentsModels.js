@@ -1,17 +1,21 @@
 const db = require('../db/connection')
 
-exports.pullComments = (article_id) => {
+exports.pullArticleComments = (article_id) => {
     return db.query('SELECT * FROM comments WHERE article_id= $1 ORDER BY created_at DESC' , [article_id])
     .then((comments) => {
+        console.log('COMMENTS')
         return comments.rows
     })
 }
 
 exports.checkArticle = (article_id) => {
+    console.log(article_id)
     return db.query('SELECT * FROM articles WHERE article_id= $1' , [article_id])
     .then((exists) => {
+        console.log(exists)
         if(exists.rowCount === 0){
             return Promise.reject({
+                //Change to 404
                 status : 400 , 
                 msg : "Article Doesn't Exist"
             })
@@ -40,14 +44,18 @@ exports.removeComment = (comment_id) => {
 }
 
 exports.fetchCommentCount = (article_id) => {
-    console.log(article_id)
-    return db.query(
-    `SELECT articles.title , (SELECT COUNT(*) FROM comments WHERE comments.$1 = articles.$1 ) AS comment_count` , [article_id])
-    .then((result) => {
-        console.log(result)
-        //Edit whatever is passed back, can't work out why $1 wont work though. Believe its to do with them being identifiers but unsure how to fix this? NCAfterHours
-        return result.rows
-    })
-}
+    console.log(article_id);
+    const query = `
+        SELECT articles.title,
+               (SELECT COUNT(*) FROM comments WHERE comments.article_id = articles.article_id) AS comment_count
+        FROM articles
+        WHERE articles.article_id = $1`
+    
+    return db.query(query, [article_id])
+        .then((result) => {
+            console.log(result.rows[0].comment_count)
+            return result.rows;
+        });
+};
 
 //    FROM articles WHERE article_id= $1

@@ -1,15 +1,18 @@
 const {
-    pullComments,
+    pullArticleComments,
     createComment,
     checkArticle,
     removeComment,
     fetchCommentCount
 } = require('../models/commentsModels')
 
-exports.getComments = (req , res , next) => {
+exports.returnArticleComments = (req , res , next) => {
+
     const {article_id} = req.params
-    Promise.all([checkArticle(article_id) , pullComments(article_id)])
+    console.log(article_id)
+    Promise.all([checkArticle(article_id) , pullArticleComments(article_id)])
     .then((comments) => {
+        console.log('COMMENTS')
         res.status(200).send({comments : comments[1]})
     })
     .catch(next)
@@ -42,8 +45,8 @@ exports.deleteComment = (req , res , next) => {
 
 exports.getCommentCount = (req , res , next) => {
     const {article_id} = req.params
-    const {comment_count} = req.query
-    comment_count === undefined
+    console.log(article_id)
+    article_id === undefined || !(typeof article_id === 'number') 
     ? next({status : 400 , msg : 'Non-Valid Query'})
     : fetchCommentCount(article_id)
     .then((result) => {

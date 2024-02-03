@@ -1,9 +1,9 @@
 const {
-    fetchTopics
+    fetchEndpoints
 } = require('../models/topicsModels')
 
-exports.getTopics = (req , res , next) => {
-    fetchTopics()
+exports.returnAllTopics = (req , res , next) => {
+    fetchEndpoints()
     .then((topics) => res.status(200).send({topics : topics}))
     .catch(next)
 }

@@ -1,25 +1,24 @@
 const {
-    fetchArticle,
-    pullAllArticles,
+    fetchByID,
+    fetchAllArticles,
     pullComments,
     checkArticle,
     createComment,
     editVotes
 } = require('../models/articlesModels')
 
-exports.articleLookup = (req , res , next) => {
-    const article_id = req.params['0']
-    fetchArticle(article_id)
+exports.returnByID = (req , res , next) => {
+    const {article_id} = req.params
+    fetchByID(article_id)
     .then((article) => {
         res.status(200).send({ article: article })
       })
       .catch(next)
 }
-
-exports.allArticles = (req , res , next) => {
-    const {topic} = req.query
-    pullAllArticles(topic)
+exports.returnAllArticles = (req , res , next) => {
+    fetchAllArticles(req.query)
     .then((articles) => {
+        console.log(articles , 'ARTICLES')
         res.status(200).send({articles : articles})
     })
     .catch(next)
@@ -46,7 +45,7 @@ exports.addComment = (req , res , next) => {
     .catch(next)
 }
 
-exports.updateVotes = (req , res , next) => {
+exports.modifyVotes = (req , res , next) => {
     const {article_id} = req.params
     const {inc_votes} = req.body
     Promise.all([editVotes(article_id , inc_votes) , checkArticle(article_id)])
