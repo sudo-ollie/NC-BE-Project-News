@@ -1,5 +1,6 @@
 const express = require('express')
 const app = express()
+const cors = require('cors');
 
 //Controller Imports
 const {
@@ -28,6 +29,7 @@ const {
 
 //Parses incoming JSON & adds to req.body
 app.use(express.json())
+app.use(cors())
 
 //Topics Endpoints
 app.get('/api/topics' , returnAllTopics) //Return All Topics
