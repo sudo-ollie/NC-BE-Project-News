@@ -1,7 +1,7 @@
 const express = require('express')
 const app = express()
 const cors = require('cors');
-app.use(cors())
+
 
 //Controller Imports
 const {
@@ -27,6 +27,9 @@ const {
 const {
     returnAllUsers
 } = require('./controllers/userController')
+
+//Use CORS
+app.use(cors())
 
 //Parses incoming JSON & adds to req.body
 app.use(express.json())
